@@ -14,6 +14,7 @@
                 font-size: 4em;
             }
         </style>
+
     </head>
     <body>
         <h1>Todos</h1>
@@ -21,9 +22,9 @@
             {{ range .Todos}}
                 <tr>
                     {{if .Checked}}
-                        <td><input type="checkbox"  checked/></td>
+                        <td><input type="checkbox"  checked onclick="sendCheck({{.ID}})"/></td>
                     {{else}}
-                        <td><input type="checkbox"/></td>
+                        <td><input type="checkbox" onclick="sendCheck({{.ID}})"/></td>
                     {{end}}
                     <td>{{.Text}}</td>
                 </tr>
