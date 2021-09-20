@@ -13,11 +13,19 @@ var templateCache map[string]*template.Template
 
 type application struct {
 	templateCache map[string]*template.Template
+	todos         []Todo
 }
 
 func main() {
 
 	app := application{}
+	app.todos = []Todo{{
+		Checked: false,
+		Text:    "Buy milk",
+	}, {
+		Checked: true,
+		Text:    "Buy eggs",
+	}}
 
 	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
 	logger.Println("Server is starting...")

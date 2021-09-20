@@ -14,6 +14,7 @@ func (app *application) routes() http.Handler {
 
 	router := pat.New()
 	router.Get("/", app.index())
+	router.Post("/add", app.addPost())
 
 	fileServer := gzipped.FileServer(gzipped.Dir("./ui/static"))
 	router.Get("/static/", (http.StripPrefix("/static/", fileServer)))

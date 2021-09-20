@@ -29,8 +29,11 @@
                 </tr>
             {{end}}
             <tr>
-                <td><input type="checkbox" /></td>
-                <td>Acheter du lait</td>
+                <td colspan="2">
+                    <form action="/add" method="post">
+                        <input type="text" minlength="2" name="text">
+                    </form>
+                </td>
             </tr>
         </table>
     </body>
