@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+	"gorm.io/gorm"
 	"html/template"
 	"log"
 	"net/http"
@@ -13,23 +14,21 @@ var templateCache map[string]*template.Template
 
 type application struct {
 	templateCache map[string]*template.Template
-	todos         []Todo
+	db            *gorm.DB
 }
 
 func main() {
 
 	app := application{}
-	app.todos = []Todo{{
-		Checked: false,
-		Text:    "Buy milk",
-	}, {
-		Checked: true,
-		Text:    "Buy eggs",
-	}}
+
+	db, err := initDb("todo.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	app.db = db
 
 	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
 	logger.Println("Server is starting...")
-	var err error
 
 	app.templateCache, err = newTemplateCache("./ui/html/")
 	if err != nil {
