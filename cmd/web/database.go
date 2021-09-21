@@ -18,6 +18,7 @@ func initDb(filename string) (*gorm.DB, error) {
 		err = db.AutoMigrate(
 			&Todo{},
 			&User{},
+			&Session{},
 		)
 		if err != nil {
 			return nil, err

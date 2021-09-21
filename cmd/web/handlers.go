@@ -78,9 +78,7 @@ func (app *application) signupPost() http.Handler {
 
 		app.db.Create(&user)
 
-		app.render(w, r, "signup.page.gohtml", TemplateData{
-			Flash: "Successful, now, Sign In",
-		})
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})
 }
 func (app *application) signin() http.Handler {
@@ -119,8 +117,8 @@ func (app *application) signinPost() http.Handler {
 			Name:  "session",
 			Value: session.Cookie,
 		}
-		r.AddCookie(&cookie)
+		http.SetCookie(w, &cookie)
 
-		app.index().ServeHTTP(w, r)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})
 }
