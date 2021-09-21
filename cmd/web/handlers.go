@@ -80,7 +80,7 @@ func (app *application) signupPost() http.Handler {
 
 		app.db.Create(&user)
 
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/signin", http.StatusSeeOther)
 	})
 }
 func (app *application) signin() http.Handler {
