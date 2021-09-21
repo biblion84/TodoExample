@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ .Title }} - TodoApp</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0', shrink-to-fit=no">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="{{ .Title }}" property="og:title">
+    <meta content="{{ .Title }}" property="twitter:title">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.css">
+    <style>
+        body {
+            font-size: 4em;
+        }
+    </style>
+
+</head>
+<body>
+<h1>Sign Up</h1>
+<form action="/signin" method="post">
+    <label for="email">Login</label>
+    <input type="text" name="email" id="email">
+    <label for="password">Password</label>
+    <input type="text" name="password" id="password">
+    <p style="color: red">{{ .Flash}}</p>
+    <button type="submit">Sign In</button>
+</form>
+</body>
+</html>
+

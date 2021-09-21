@@ -10,6 +10,7 @@ type TemplateData struct {
 
 	CSRFToken string
 	Title     string
+	Flash     string
 }
 
 var functions template.FuncMap

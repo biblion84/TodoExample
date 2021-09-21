@@ -2,10 +2,23 @@ package main
 
 import (
 	"bytes"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 )
+
+func generateCookie() string {
+	b := make([]byte, 60)
+
+	if _, err := io.ReadFull(rand.Reader, b); err != nil {
+		panic(err)
+	}
+
+	return base64.StdEncoding.EncodeToString(b)
+}
 
 func (app *application) render(w http.ResponseWriter, r *http.Request, name string, templateData TemplateData) {
 	var ts *template.Template

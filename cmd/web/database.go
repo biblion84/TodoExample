@@ -17,6 +17,7 @@ func initDb(filename string) (*gorm.DB, error) {
 		fmt.Println("Start migration")
 		err = db.AutoMigrate(
 			&Todo{},
+			&User{},
 		)
 		if err != nil {
 			return nil, err
