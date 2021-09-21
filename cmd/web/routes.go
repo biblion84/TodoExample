@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/bmizerany/pat"
-	"github.com/lpar/gzipped/v2"
 	"net/http"
 )
 
@@ -17,7 +16,7 @@ func (app *application) routes() http.Handler {
 	router.Get("/signin", app.signin())
 	router.Post("/signin", app.signinPost())
 
-	fileServer := gzipped.FileServer(gzipped.Dir("./ui/static"))
+	fileServer := http.FileServer(http.Dir("./ui/static"))
 	router.Get("/static/", (http.StripPrefix("/static/", fileServer)))
 
 	//router.NotFound = loginRequired.Then(app.notFound())
