@@ -14,7 +14,15 @@
                 font-size: 4em;
             }
         </style>
-
+        <script>
+            function sendCheck(event) {
+                let id = event.target.getAttribute("id")
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", '/checkTodo', true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.send("id=" + id + "&checked=" + event.target.checked);
+            }
+        </script>
     </head>
     <body>
         <h1>Todos</h1>
@@ -22,9 +30,9 @@
             {{ range .Todos}}
                 <tr>
                     {{if .Checked}}
-                        <td><input type="checkbox"  checked onclick="sendCheck({{.ID}})"/></td>
+                        <td><input type="checkbox"  checked id="{{.ID}}"/></td>
                     {{else}}
-                        <td><input type="checkbox" onclick="sendCheck({{.ID}})"/></td>
+                        <td><input type="checkbox" id="{{.ID}}"/></td>
                     {{end}}
                     <td>{{.Text}}</td>
                 </tr>
@@ -38,5 +46,12 @@
             </tr>
         </table>
     </body>
+    <script>
+        var checkbox = document.querySelectorAll('input[type=checkbox]');
+        checkbox.forEach((node) => {
+            node.addEventListener('click', sendCheck)
+        })
+
+    </script>
 </html>
 

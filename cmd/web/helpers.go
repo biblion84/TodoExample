@@ -10,6 +10,22 @@ import (
 	"net/http"
 )
 
+func (app *application) getUser(r *http.Request) User {
+	var user User
+	cookie, err := r.Cookie("session")
+	if err != nil || cookie == nil {
+		return user
+	}
+	var session Session
+	app.db.First(&session, Session{Cookie: cookie.Value})
+	if session.ID == 0 {
+		return user
+	}
+
+	app.db.Find(&user, User{Email: session.Email})
+	return user
+}
+
 func generateCookie() string {
 	b := make([]byte, 60)
 

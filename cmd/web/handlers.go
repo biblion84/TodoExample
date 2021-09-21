@@ -9,7 +9,8 @@ import (
 func (app *application) index() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var todos []Todo
-		app.db.Find(&todos)
+		user := app.getUser(r)
+		app.db.Find(&todos, Todo{UserID: user.ID})
 		app.render(w, r, "index.page.gohtml", TemplateData{
 			Todos: todos,
 		})
@@ -20,13 +21,15 @@ func (app *application) addPost() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		text := r.Form.Get("text")
+		user := app.getUser(r)
 		todo := Todo{
 			Checked: false,
 			Text:    text,
+			UserID:  user.ID,
 		}
 		app.db.Create(&todo)
 
-		app.index().ServeHTTP(w, r)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})
 }
 
@@ -34,14 +37,13 @@ func (app *application) checkTodoPost() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		id := r.Form.Get("id")
-		state := r.Form.Get("state")
+		state := r.Form.Get("checked")
 		var todo Todo
 		app.db.Find(&todo, id)
 		if todo.ID != 0 {
 			todo.Checked = state == "true"
 			app.db.Save(&todo)
 		}
-		app.index().ServeHTTP(w, r)
 	})
 }
 
