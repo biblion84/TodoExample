@@ -9,9 +9,8 @@ func (app *application) loginRequired(next http.Handler) http.Handler {
 			app.signup().ServeHTTP(w, r)
 			return
 		}
-		var session Session
-		app.db.First(&session, Session{Cookie: cookie.Value})
-		if session.ID == 0 {
+		session, err := app.SessionFind(cookie.Value)
+		if err != nil || session.ID == 0 {
 			app.signup().ServeHTTP(w, r)
 			return
 		}

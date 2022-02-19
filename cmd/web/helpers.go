@@ -10,19 +10,25 @@ import (
 	"net/http"
 )
 
+// TODO put user value in context.Context
 func (app *application) getUser(r *http.Request) User {
-	var user User
 	cookie, err := r.Cookie("session")
 	if err != nil || cookie == nil {
-		return user
+		return User{}
 	}
-	var session Session
-	app.db.First(&session, Session{Cookie: cookie.Value})
-	if session.ID == 0 {
+
+	session, err := app.SessionFind(cookie.Value)
+
+	if err != nil || session.ID == 0 {
+		return User{}
+	}
+
+	user, err := app.UserFindByEmail(session.Email)
+
+	if err != nil || user.ID == 0 {
 		return user
 	}
 
-	app.db.Find(&user, User{Email: session.Email})
 	return user
 }
 

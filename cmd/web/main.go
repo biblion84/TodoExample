@@ -2,7 +2,7 @@ package main
 
 import (
 	"crypto/tls"
-	"gorm.io/gorm"
+	"database/sql"
 	"html/template"
 	"log"
 	"net/http"
@@ -14,7 +14,7 @@ var templateCache map[string]*template.Template
 
 type application struct {
 	templateCache map[string]*template.Template
-	db            *gorm.DB
+	db            *sql.DB
 }
 
 func main() {
