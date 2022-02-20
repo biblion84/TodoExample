@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	_ "github.com/mattn/go-sqlite3"
@@ -16,8 +17,8 @@ func (app *application) index() http.Handler {
 			return
 		}
 
-		user := app.getUser(r)
-		todos, err := app.TodoGetByUserId(user.ID)
+		user := app.getUser(r.Context())
+		todos, err := app.TodoGetByUserId(r.Context(), user.ID)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -35,13 +36,13 @@ func (app *application) addPost() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		text := r.Form.Get("text")
-		user := app.getUser(r)
+		user := app.getUser(r.Context())
 		todo := Todo{
 			Checked: false,
 			Text:    text,
 			UserID:  user.ID,
 		}
-		err := app.TodoCreate(&todo)
+		err := app.TodoCreate(r.Context(), &todo)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -70,7 +71,7 @@ func (app *application) checkTodoPost() http.Handler {
 			return
 		}
 
-		err = app.TodoSetCheck(r.Form.Get("checked") == "true", id)
+		err = app.TodoSetCheck(r.Context(), r.Form.Get("checked") == "true", id)
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -102,7 +103,7 @@ func (app *application) signupPost() http.Handler {
 		email := r.Form.Get("email")
 		password := r.Form.Get("password")
 
-		userExist, err := app.UserExist(email)
+		userExist, err := app.UserExist(r.Context(), email)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -128,7 +129,7 @@ func (app *application) signupPost() http.Handler {
 		user.PasswordHash = string(passwordHash)
 		user.Email = email
 
-		err = app.UserCreate(&user)
+		err = app.UserCreate(r.Context(), &user)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -162,7 +163,7 @@ func (app *application) signinPost() http.Handler {
 		email := r.Form.Get("email")
 		password := r.Form.Get("password")
 
-		user, err := app.UserFindByEmail(email)
+		user, err := app.UserFindByEmail(r.Context(), email)
 
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
@@ -190,7 +191,7 @@ func (app *application) signinPost() http.Handler {
 		session.Cookie = generateCookie()
 		session.Email = user.Email
 
-		err = app.SessionCreate(&session)
+		err = app.SessionCreate(r.Context(), &session)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -206,4 +207,18 @@ func (app *application) signinPost() http.Handler {
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})
+}
+
+func (app *application) test() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		for i := 0; i < 10000; i++ {
+			todo := Todo{
+				Checked: false,
+				Text:    "Test " + strconv.Itoa(i),
+				UserID:  1,
+			}
+			app.TodoCreate(context.Background(), &todo)
+		}
+	})
+
 }

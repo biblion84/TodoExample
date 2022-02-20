@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -44,8 +45,8 @@ func initDb(filename string) (*sql.DB, error) {
 	return db, nil
 }
 
-func (app *application) TodoGetByUserId(userId uint) ([]Todo, error) {
-	rows, err := app.db.Query(`
+func (app *application) TodoGetByUserId(ctx context.Context, userId uint) ([]Todo, error) {
+	rows, err := app.db.QueryContext(ctx, `
 	SELECT "id", "checked", "text", "user_id"
 	FROM "todos"
 	WHERE "user_id" = ?
@@ -69,8 +70,8 @@ func (app *application) TodoGetByUserId(userId uint) ([]Todo, error) {
 	return result, nil
 }
 
-func (app *application) TodoSetCheck(checked bool, id int) error {
-	result, err := app.db.Exec(`
+func (app *application) TodoSetCheck(ctx context.Context, checked bool, id int) error {
+	result, err := app.db.ExecContext(ctx, `
 	UPDATE "todos"
 	SET "checked" = ?
 	WHERE "id" = ?
@@ -93,9 +94,9 @@ func (app *application) TodoSetCheck(checked bool, id int) error {
 	return nil
 }
 
-func (app *application) TodoCreate(todo *Todo) error {
+func (app *application) TodoCreate(ctx context.Context, todo *Todo) error {
 
-	result, err := app.db.Exec(`
+	result, err := app.db.ExecContext(ctx, `
 	INSERT INTO "todos" ("checked", "text", "user_id")
 	VALUES (?, ?, ?)
 	`, todo.Checked, todo.Text, todo.UserID)
@@ -115,9 +116,9 @@ func (app *application) TodoCreate(todo *Todo) error {
 	return nil
 }
 
-func (app *application) UserExist(email string) (bool, error) {
+func (app *application) UserExist(ctx context.Context, email string) (bool, error) {
 	var id uint
-	err := app.db.QueryRow(`
+	err := app.db.QueryRowContext(ctx, `
 	SELECT "id"
 	FROM "users"
 	WHERE "users"."email" = ?
@@ -130,8 +131,8 @@ func (app *application) UserExist(email string) (bool, error) {
 	return id != 0, err
 }
 
-func (app *application) UserCreate(user *User) error {
-	result, err := app.db.Exec(`
+func (app *application) UserCreate(ctx context.Context, user *User) error {
+	result, err := app.db.ExecContext(ctx, `
 	INSERT INTO "users" ("email", "password_hash")
 	VALUES (?, ?)
 	`, user.Email, user.PasswordHash)
@@ -151,10 +152,10 @@ func (app *application) UserCreate(user *User) error {
 	return nil
 }
 
-func (app *application) UserFindByEmail(email string) (User, error) {
+func (app *application) UserFindByEmail(ctx context.Context, email string) (User, error) {
 	var user User
 
-	err := app.db.QueryRow(`
+	err := app.db.QueryRowContext(ctx, `
 	SELECT "id", "email", "password_hash"
 	FROM "users"
 	WHERE "users"."email" = ?
@@ -163,8 +164,8 @@ func (app *application) UserFindByEmail(email string) (User, error) {
 	return user, err
 }
 
-func (app *application) SessionCreate(session *Session) error {
-	result, err := app.db.Exec(`
+func (app *application) SessionCreate(ctx context.Context, session *Session) error {
+	result, err := app.db.ExecContext(ctx, `
 	INSERT INTO "sessions" ("cookie", "email")
 	VALUES (?, ?)
 	`, session.Cookie, session.Email)
@@ -184,10 +185,10 @@ func (app *application) SessionCreate(session *Session) error {
 	return nil
 }
 
-func (app *application) SessionFind(cookie string) (Session, error) {
+func (app *application) SessionFind(ctx context.Context, cookie string) (Session, error) {
 	var session Session
 
-	err := app.db.QueryRow(`
+	err := app.db.QueryRowContext(ctx, `
 	SELECT "id", "cookie", "email"
 	FROM "sessions"
 	WHERE "cookie" = ?

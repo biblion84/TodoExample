@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
@@ -11,19 +12,15 @@ import (
 )
 
 // TODO put user value in context.Context
-func (app *application) getUser(r *http.Request) User {
-	cookie, err := r.Cookie("session")
-	if err != nil || cookie == nil {
+func (app *application) getUser(ctx context.Context) User {
+	// Session should be in context -> cf loginRequired middleware
+	session, ok := ctx.Value("session").(Session)
+
+	if !ok || session.ID == 0 {
 		return User{}
 	}
 
-	session, err := app.SessionFind(cookie.Value)
-
-	if err != nil || session.ID == 0 {
-		return User{}
-	}
-
-	user, err := app.UserFindByEmail(session.Email)
+	user, err := app.UserFindByEmail(ctx, session.Email)
 
 	if err != nil || user.ID == 0 {
 		return user
